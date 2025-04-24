@@ -4,7 +4,7 @@ import { Router } from "express"
 import { rateLimiter } from "../middleware"
 
 const router = Router()
-router.use(rateLimiter(10, 2 * 60 * 1000))
+router.use(rateLimiter(20, 1 * 60 * 1000))
 router.use("/users", userrouter)
 router.use("/blog", blog)
 

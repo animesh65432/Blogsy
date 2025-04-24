@@ -4,6 +4,7 @@ import bcrypt from "bcrypt"
 import jsonwebtoken from "jsonwebtoken"
 import config from "../../config"
 import { asyncerrorhandler } from "../../utils"
+import Config from "../../config"
 
 const createUser = asyncerrorhandler(async (req: Request, res: Response) => {
     const { email, name, password } = req.body;
@@ -42,8 +43,10 @@ const createUser = asyncerrorhandler(async (req: Request, res: Response) => {
     return
 });
 
-const loginUser = async (req: Request, res: Response) => {
+const loginUser = asyncerrorhandler(async (req: Request, res: Response) => {
     const { email, password } = req.body;
+
+    console.log(email, "loginuser")
 
     if (!email || !password) {
         res.status(400).json({ message: "Invalid credentials" });
@@ -67,21 +70,79 @@ const loginUser = async (req: Request, res: Response) => {
         return
     }
 
-    const token = jsonwebtoken.sign({ email: user.email, id: user.id }, config.JSONWEBTOEKN as string, {
-        expiresIn: "1h",
+    const token = jsonwebtoken.sign({ email: user.email }, config.JSONWEBTOEKN as string, {
+        expiresIn: "7d",
     });
 
     res.cookie("token", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
-        maxAge: 15 * 24 * 60 * 60 * 1000
+        maxAge: 1000 * 24 * 60 * 60 * 1000
     });
 
 
     res.status(200).json({ message: "Successfully logged in" });
     return
-};
+});
 
+const googleCallback = asyncerrorhandler(async (req: Request, res: Response) => {
+    const { email } = req.body;
+    console.log(email, "googlcallback")
+    if (!email) {
+        res.status(400).json({ message: "Invalid credentials. No email found." });
+        return;
+    }
 
-export { createUser, loginUser }
+    const { data: existingUser } = await db
+        .from("User")
+        .select("*")
+        .eq("email", email)
+        .single();
+
+    if (existingUser) {
+        const token = jsonwebtoken.sign(
+            { email },
+            Config.JSONWEBTOEKN!,
+            { expiresIn: "15d" }
+        );
+        res.cookie("token", token, {
+            httpOnly: true,
+            maxAge: 1000 * 60 * 60 * 24 * 15,
+            sameSite: "lax",
+        });
+        res.status(200).json({ message: "User already exists." });
+        return;
+    }
+
+    const { data: newUser } = await db
+        .from("User")
+        .insert([
+            {
+                email,
+            },
+        ])
+        .single();
+
+    if (!newUser) {
+        res.status(400).json({ message: "User creation failed." });
+        return;
+    }
+
+    const token = jsonwebtoken.sign(
+        { email },
+        Config.JSONWEBTOEKN!,
+        { expiresIn: "15d" }
+    );
+
+    res.cookie("token", token, {
+        httpOnly: true,
+        maxAge: 1000 * 60 * 60 * 24 * 15,
+        sameSite: "lax",
+    });
+
+    res.status(200).json({ message: "Successfully logged in." });
+    return
+});
+
+export { createUser, loginUser, googleCallback }

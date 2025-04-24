@@ -1,13 +1,15 @@
 import { Request, Response, NextFunction } from "express"
-import { asyncfuncerrorpayload } from "../types"
 import bcrypt from "bcrypt"
 import db from "../db";
-const asyncerrorhandler = (func: asyncfuncerrorpayload) => {
-    return (req: Request, res: Response, next: NextFunction) => {
-        func(req, res, next).catch(err => next(err));
-    }
-}
-
+import genAI from "../service";
+const API_URL = "https://api.deepseek.com/v1/chat/completions";
+const asyncerrorhandler = <T extends Request>(
+    func: (req: T, res: Response, next: NextFunction) => Promise<void>
+) => {
+    return (req: T, res: Response, next: NextFunction) => {
+        func(req, res, next).catch((err) => next(err));
+    };
+};
 const createDummyUser = async () => {
     try {
         const hashPassword = await bcrypt.hash("testpassword", 10);
@@ -40,4 +42,14 @@ const createDummyUser = async () => {
         console.log("Error:", error);
     }
 };
-export { asyncerrorhandler, createDummyUser }
+async function getDeepSeekResponse(prompt: string) {
+    try {
+        const result = await genAI.generateContent(` can you summerize these == "${prompt}"`);
+        const response = result.response.text()
+        return response
+    } catch (error) {
+        console.error("⚠️ Error calling DeepSeek AI:", error);
+        return null;
+    }
+}
+export { asyncerrorhandler, createDummyUser, getDeepSeekResponse }

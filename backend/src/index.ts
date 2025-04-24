@@ -7,8 +7,10 @@ import { createDummyUser } from "./utils"
 import router from "./routers"
 const app = express()
 app.use(cors({
-    origin: "*"
+    origin: "http://localhost:3000",
+    credentials: true
 }))
+
 app.use(cookieParser())
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
