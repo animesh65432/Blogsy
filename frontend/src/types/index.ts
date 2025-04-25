@@ -1,5 +1,5 @@
-export type Blogs {
-    id: number,
-    title: string,
-    content: string
+export type Blogs = {
+    id: number;
+    title: string;
+    content: string;
 }
