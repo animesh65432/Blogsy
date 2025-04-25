@@ -9,7 +9,8 @@ const Config = {
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     GOOGLE_REDIRECT_URI: process.env.GOOGLE_REDIRECT_URI,
     DEEPSAKE_API_KEY: process.env.DEEPSAKE_API_KEY,
-    Gemein_api_key: process.env.Gemein_api_key
+    Gemein_api_key: process.env.Gemein_api_key,
+    FRONTEND_URL: process.env.FRONTEND_URL
 }
 
 export default Config

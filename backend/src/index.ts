@@ -7,7 +7,7 @@ import { createDummyUser } from "./utils"
 import router from "./routers"
 const app = express()
 app.use(cors({
-    origin: "http://localhost:3000",
+    origin: Config.FRONTEND_URL,
     credentials: true
 }))
 
