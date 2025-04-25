@@ -80,8 +80,8 @@ export default function Login() {
                     <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-md space-y-6">
                         <h2 className="text-3xl font-semibold text-center">Login to your account</h2>
 
-                        <div className="w-[100%] flex justify-center">
-                            <Button className="bg-white text-black hover:bg-amber-50 w-full sm:w-2/3 md:w-1/2 lg:w-[30%] border-0" onClick={handleContinueWithGoogle} >
+                        <div className="w-full flex justify-center">
+                            <Button className=" bg-white text-black hover:bg-amber-50 w-full sm:w-2/3 md:w-1/2 lg:w-[50%] border-0" onClick={handleContinueWithGoogle} >
                                 Continue With google
                             </Button>
                         </div>
