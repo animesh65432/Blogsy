@@ -1,4 +1,3 @@
-import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import axios from "axios";
 import config from "@/config";
